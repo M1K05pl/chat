@@ -49,7 +49,7 @@
 
        
         function disconnect(){
-            socket.emit('userleft')
+            socket.emit('userleft', user)
             socket.disconnect()
         }
         

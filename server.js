@@ -6,12 +6,12 @@ var io = require('socket.io').listen(server)
 app.use(express.static('public'))
 var users = []
 io.on('connection', socket => {
-    console.log(`- Uzytkownik o ID ${socket.id} polaczony!`)
+    console.log(`+ Uzytkownik o ID ${socket.id} polaczony!`)
     socket.on('setUsername', data => {
-        if(users.indexOf(data) > -2) {
+        if(!users.includes(data)) {
             users.push(data)
             socket.emit('userSet', {username: data})
-            console.log(`- ${socket.id} zmienił nick na ${data}`)
+            console.log(`• ${socket.id} zmienił nick na ${data}`)
             io.sockets.emit('userlistupdate', users)
         }
         else {
@@ -26,6 +26,7 @@ io.on('connection', socket => {
     socket.on('userleft', data => {
         users.splice( users.indexOf(data), 1)
         io.sockets.emit('userlistupdate', users)
+        console.log(`- ${data} opuścił czat.`)
     } )
 
     
