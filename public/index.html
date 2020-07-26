@@ -6,6 +6,8 @@
     <title>Document</title>
     <script src="./socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
 </head>
 
 <script>
@@ -19,26 +21,49 @@
     })
     socket.on('userSet', data => {
         user = data.username
-        document.body.innerHTML = `<input type="text" id="message"></br>
-    <button type="button" name="button" onclick="sendMessage()">Wyslij</button>
-    <div id="messages"></div>`
+        document.body.innerHTML = `<input type="text" id="message" placeholder="Wpisz swoją wiadomość...">
+    <button type="button" id="button" name="button" onclick="sendMessage()">Wyślij</button>
+    <div id="messages"></div>
+    <div id="usersInfo"><b>Aktywni użytkownicy</b>:</div>
+    <div id="users"></div>`
     })
     var id = socket.id
         function sendMessage() {
             var msg = document.getElementById('message').value
             if(msg){
                 socket.emit('msg', {message: msg, user: user})
+                document.getElementById('message').value = ''
+                
             }
         }
+        
+        
+        
         socket.on('newmsg', data => {
             document.getElementById('messages').innerHTML += '<div><b>' + data.user + "</b>: " + data.message + "</div>"
         })
+        socket.on('userlistupdate', data => {
+            document.getElementById('users').innerHTML = "<br>" + data + "<br>"
+        })
+
+
+       
+        function disconnect(){
+            socket.emit('userleft')
+            socket.disconnect()
+        }
+        
 
 </script>
-<body>
+<body onunload="disconnect()">
+    <script> document.body.getElementById('message').addEventListener('keyup', function(event){
+        if (event.keyCode === 13) {
+            document.getElementById('button').click()
+        }
+    })</script>
     <div id = "error"></div>
     <input id="name" type="text" name="name" value=""
-    placeholder="Podaj nick!">
-    <button type="button" name="button" onclick="setUsername()">Wyslij</button>
+    placeholder="Podaj nick!" maxlength="10">
+    <button type="button" id="button" name="button" onclick="setUsername()">Wyślij</button>
 </body>
 </html>

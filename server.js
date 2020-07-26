@@ -4,22 +4,29 @@ var server = app.listen(3000)
 var io = require('socket.io').listen(server)
 
 app.use(express.static('public'))
-users = []
+var users = []
 io.on('connection', socket => {
-    console.log("Connected!", socket.id)
+    console.log(`- Uzytkownik o ID ${socket.id} polaczony!`)
     socket.on('setUsername', data => {
         if(users.indexOf(data) > -2) {
             users.push(data)
             socket.emit('userSet', {username: data})
+            console.log(`- ${socket.id} zmienił nick na ${data}`)
+            io.sockets.emit('userlistupdate', users)
         }
         else {
             socket.emit('userExists', data + ` nazwa jest zajeta.`)
         }
     })
     socket.on('msg', (data) => {
-        io.sockets.emit('newmsg', data)
+        io.emit('newmsg', data)
+        console.log(`>> ${data.user}: ${data.message}`)
+        
     })
-    
+    socket.on('userleft', data => {
+        users.splice( users.indexOf(data), 1)
+        io.sockets.emit('userlistupdate', users)
+    } )
 
     
     
