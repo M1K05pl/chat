@@ -15,7 +15,7 @@ io.on('connection', socket => {
             io.sockets.emit('userlistupdate', users)
         }
         else {
-            socket.emit('userExists', data + ` nazwa jest zajeta.`)
+            socket.emit('userExists', `Nick ${data} jest zajęty. Wybierz inną nazwę.`)
         }
     })
     socket.on('msg', (data) => {
